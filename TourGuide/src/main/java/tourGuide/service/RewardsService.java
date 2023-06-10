@@ -1,25 +1,26 @@
 package tourGuide.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import org.springframework.stereotype.Service;
 import rewardCentral.RewardCentral;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 @Service
 public class RewardsService {
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
 	// proximity in miles
-	private int defaultProximityBuffer = 10;
+	private final int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
-	private int attractionProximityRange = 200;
+	private final int attractionProximityRange = 200;
 	private final GpsUtil gpsUtil;
 	private final RewardCentral rewardsCentral;
 
@@ -39,26 +40,51 @@ public class RewardsService {
 	}
 
 	public void calculateRewards(User user) {
+		//create copy of user's visitedLocation list
 		List<VisitedLocation> userLocations = new CopyOnWriteArrayList<>(user.getVisitedLocations());
+		//create attraction list from gpsUtil
 		List<Attraction> attractions = gpsUtil.getAttractions();
 
-		userLocations.parallelStream()
-				.forEach(visitedLocation -> attractions
-				.parallelStream()
-				.filter(attraction -> user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName))
-				&& nearAttraction(visitedLocation, attraction))
-				.forEach(attraction -> user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)))));
+		//create task list
+		List<Callable<UserReward>> tasks  = new ArrayList<>();
+		//verify attraction of user's visitedLocation list
+		userLocations.forEach(visitedLocation -> attractions
+				.stream()
+				//filter attractions which is not in user's userRewards list
+				.filter(attraction -> user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName)))
+				//filter attractions which is near from visited location
+				.filter(attraction -> nearAttraction(visitedLocation, attraction))
+				//create rewards to each attraction by visitedLocation, attraction and rewardPoints
+				.forEach(attraction -> tasks.add( ()-> new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user))))
+		);
+
+		try {
+			//get results of tasks and add user's user rewards list
+			List<Future<UserReward>> rewardFutures = executorService.invokeAll(tasks);
+			for (Future<UserReward> future : rewardFutures) {
+				//add userReward list
+				user.addUserReward(future.get()); // this setter filters out duplicated rewards
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		} finally {
+			executorService.shutdown();
+		}
+
 	}
 
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
+		//verify if the distance of attraction and the location is not bigger than 200
 		return !(getDistance(attraction, location) > attractionProximityRange);
 	}
 
 	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
+		//verify if the distance of attraction and the location is not bigger than 10
 		return !(getDistance(attraction, visitedLocation.location) > proximityBuffer);
 	}
 
 	private int getRewardPoints(Attraction attraction, User user) {
+		//get random attraction reward points
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
 	}
 
@@ -72,8 +98,7 @@ public class RewardsService {
 				+ Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
 
 		double nauticalMiles = 60 * Math.toDegrees(angle);
-		double statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
-		return statuteMiles;
+		return STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
 	}
 
 }

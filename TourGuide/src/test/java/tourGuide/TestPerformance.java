@@ -84,13 +84,19 @@ public class TestPerformance {
 		stopWatch.start();
 		//WHEN
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
-		
+
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
 		List<User> allUsers = tourGuideService.getAllUsers();
-		allUsers.parallelStream().forEach(u -> {
-			 u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date()));
-	         rewardsService.calculateRewards(u);}
-		);
+		List<Callable<Object>> tasks = new ArrayList<>();
+
+		allUsers.forEach(user -> user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date())) );
+		allUsers.forEach(user -> tasks.add(Executors.callable(()->rewardsService.calculateRewards(user))));
+
+		ExecutorService executorService = Executors.newFixedThreadPool(100);
+
+		executorService.invokeAll(tasks);
+		executorService.shutdown();
+
 
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
