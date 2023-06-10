@@ -11,8 +11,12 @@ import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
@@ -40,20 +44,26 @@ public class TestPerformance {
 	 */
 
 	@Test
-	public void highVolumeTrackLocation() {
+	public void highVolumeTrackLocation() throws Exception {
 		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(100);
+		InternalTestHelper.setInternalUserNumber(100_000);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		List<User> allUsers = tourGuideService.getAllUsers();
 		
 	    StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+
 		//WHEN
-		allUsers.parallelStream().forEach(tourGuideService::trackUserLocation);
+
+		List<Callable<VisitedLocation>> tasks = new ArrayList<>();
+		allUsers.forEach(user -> tasks.add(() -> tourGuideService.trackUserLocation(user)));
+		ExecutorService executorService = Executors.newFixedThreadPool(100);
+		executorService.invokeAll(tasks);
+		executorService.shutdown();
 
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
@@ -63,7 +73,7 @@ public class TestPerformance {
 	}
 
 	@Test
-	public void highVolumeGetRewards() {
+	public void highVolumeGetRewards() throws Exception {
 		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
