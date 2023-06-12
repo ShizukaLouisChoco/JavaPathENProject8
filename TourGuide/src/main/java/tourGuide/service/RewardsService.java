@@ -24,7 +24,7 @@ public class RewardsService {
 	private final GpsUtil gpsUtil;
 	private final RewardCentral rewardsCentral;
 
-	private final ExecutorService executorService = Executors.newCachedThreadPool();
+	private final ExecutorService executorService = Executors.newFixedThreadPool(100);
 
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
@@ -41,13 +41,14 @@ public class RewardsService {
 
 	public void calculateRewards(User user) {
 		//create copy of user's visitedLocation list
-		List<VisitedLocation> userLocations = new CopyOnWriteArrayList<>(user.getVisitedLocations());
+		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		//create attraction list from gpsUtil
 		List<Attraction> attractions = gpsUtil.getAttractions();
 
 		//create task list
 		List<Callable<UserReward>> tasks  = new ArrayList<>();
 		//verify attraction of user's visitedLocation list
+
 		userLocations.forEach(visitedLocation -> attractions
 				.stream()
 				//filter attractions which is not in user's userRewards list

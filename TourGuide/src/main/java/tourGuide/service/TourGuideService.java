@@ -31,7 +31,7 @@ public class TourGuideService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
-	public final ExecutorService executorService =  Executors.newCachedThreadPool();
+	public final ExecutorService executorService = Executors.newFixedThreadPool(100);
 	
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
@@ -72,7 +72,7 @@ public class TourGuideService {
 	}
 	
 	public List<Provider> getTripDeals(User user) {
-		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
+		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
 				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
 		user.setTripDeals(providers);
@@ -101,17 +101,15 @@ public class TourGuideService {
 
 	public void stopTracking() throws Exception {
 		tracker.stopTracking();
+		logger.debug("Tracker stopped. Completing tasks");
 		executorService.shutdown();
 		while(!executorService.awaitTermination(1, TimeUnit.MINUTES)){
 		}
+		logger.debug("Tasks Completed");
 	}
 	
 	private void addShutDownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() { 
-		      public void run() {
-		        tracker.stopTracking();
-		      } 
-		    }); 
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> tracker.stopTracking()));
 	}
 
 	/**********************************************************************************

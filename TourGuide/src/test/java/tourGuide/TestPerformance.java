@@ -97,15 +97,19 @@ public class TestPerformance {
 		executorService.invokeAll(tasks);
 		executorService.shutdown();
 
-
 		stopWatch.stop();
-		tourGuideService.tracker.stopTracking();
+		tourGuideService.stopTracking();
 		//THEN
+		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
+		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
+
+		System.out.println(allUsers.stream().filter(u -> u.getUserRewards().size()>0).count() );
+		System.out.println(allUsers.stream().filter(u -> u.getUserRewards().size() == 0).count());
+
 		for(User user : allUsers) {
+			System.out.println("User : " + user.getUserRewards().size());
 			assertTrue(user.getUserRewards().size() > 0);
 		}
-		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
-		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 	
 }
