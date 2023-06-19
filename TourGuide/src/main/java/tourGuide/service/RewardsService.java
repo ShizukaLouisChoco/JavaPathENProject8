@@ -56,7 +56,18 @@ public class RewardsService {
 				//filter attractions which is near from visited location
 				.filter(attraction -> nearAttraction(visitedLocation, attraction))
 				//create rewards to each attraction by visitedLocation, attraction and rewardPoints
-				.forEach(attraction -> tasks.add( ()-> new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user))))
+				.forEach(attraction -> tasks.add( ()-> user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)))))
+		);*/
+
+		userLocations.forEach(visitedLocation -> attractions
+				.stream()
+				//filter attractions which is not in user's userRewards list
+				.filter(attraction -> user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName)))
+				//filter attractions which is near from visited location
+				.filter(attraction -> nearAttraction(visitedLocation, attraction))
+				//create rewards to each attraction by visitedLocation, attraction and rewardPoints
+				.forEach(attraction -> user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user))))
+
 		);
 
 		try {
