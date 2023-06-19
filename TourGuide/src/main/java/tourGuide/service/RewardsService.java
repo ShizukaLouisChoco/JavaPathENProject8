@@ -4,15 +4,18 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import rewardCentral.RewardCentral;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+@Slf4j
 @Service
 public class RewardsService {
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
@@ -32,20 +35,23 @@ public class RewardsService {
 	}
 
 	public void setProximityBuffer(int proximityBuffer) {
+		log.info("setting proximityBuffer in RewardService");
 		this.proximityBuffer = proximityBuffer;
 	}
 
 	public void setDefaultProximityBuffer() {
+		log.info("setting default proximityBuffer in RewardService");
 		proximityBuffer = defaultProximityBuffer;
 	}
 
 	public void calculateRewards(User user) {
+		log.info("calculating rewards in RewardService");
 		//create copy of user's visitedLocation list
-		List<VisitedLocation> userLocations = user.getVisitedLocations();
+		List<VisitedLocation> userLocations = new CopyOnWriteArrayList<>( user.getVisitedLocations());
 		//create attraction list from gpsUtil
 		List<Attraction> attractions = gpsUtil.getAttractions();
 
-		//create task list
+		/*//create task list
 		List<Callable<UserReward>> tasks  = new ArrayList<>();
 		//verify attraction of user's visitedLocation list
 
@@ -69,38 +75,31 @@ public class RewardsService {
 				.forEach(attraction -> user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user))))
 
 		);
+		log.info("rewards calculated in RewardService");
 
-		try {
-			//get results of tasks and add user's user rewards list
-			List<Future<UserReward>> rewardFutures = executorService.invokeAll(tasks);
-			for (Future<UserReward> future : rewardFutures) {
-				//add userReward list
-				user.addUserReward(future.get()); // this setter filters out duplicated rewards
-			}
-		} catch (InterruptedException | ExecutionException e) {
-			throw new RuntimeException(e);
-		} finally {
-			executorService.shutdown();
-		}
 
 	}
 
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
+		log.info("verifying if attraction and location is proximity or not in RewardService");
 		//verify if the distance of attraction and the location is not bigger than 200
 		return !(getDistance(attraction, location) > attractionProximityRange);
 	}
 
 	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
+		log.info("verifying if attraction and visited location is proximity or not in RewardService");
 		//verify if the distance of attraction and the location is not bigger than 10
 		return !(getDistance(attraction, visitedLocation.location) > proximityBuffer);
 	}
 
 	private int getRewardPoints(Attraction attraction, User user) {
+		log.info("getting reward points in RewardService");
 		//get random attraction reward points
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
 	}
 
 	public double getDistance(Location loc1, Location loc2) {
+		log.info("getting distance of location1 and location2 in RewardService");
 		double lat1 = Math.toRadians(loc1.latitude);
 		double lon1 = Math.toRadians(loc1.longitude);
 		double lat2 = Math.toRadians(loc2.latitude);
