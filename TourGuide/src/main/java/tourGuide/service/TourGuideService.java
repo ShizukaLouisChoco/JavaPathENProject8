@@ -121,13 +121,13 @@ public class TourGuideService {
 	// Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
 	private final Map<String, User> internalUserMap = new HashMap<>();
 	private void initializeInternalUsers() {
+		logger.debug("Creating " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 		IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
 			String userName = "internalUser" + i;
 			String phone = "000";
 			String email = userName + "@tourGuide.com";
 			User user = new User(UUID.randomUUID(), userName, phone, email);
 			generateUserLocationHistory(user);
-		logger.debug("Creating " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 
 			internalUserMap.put(userName, user);
 		});

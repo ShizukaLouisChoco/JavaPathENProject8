@@ -79,7 +79,7 @@ public class TestPerformance {
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100);
+		InternalTestHelper.setInternalUserNumber(100_000);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		//WHEN
@@ -103,11 +103,8 @@ public class TestPerformance {
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 
-		System.out.println(allUsers.stream().filter(u -> u.getUserRewards().size()>0).count() );
-		System.out.println(allUsers.stream().filter(u -> u.getUserRewards().size() == 0).count());
 
 		for(User user : allUsers) {
-			System.out.println("User : " + user.getUserRewards().size());
 			assertTrue(user.getUserRewards().size() > 0);
 		}
 	}

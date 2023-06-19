@@ -24,7 +24,6 @@ public class RewardsService {
 	private final GpsUtil gpsUtil;
 	private final RewardCentral rewardsCentral;
 
-	private final ExecutorService executorService = Executors.newFixedThreadPool(100);
 
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
@@ -59,6 +58,7 @@ public class RewardsService {
 				.forEach(attraction -> tasks.add( ()-> new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user))))
 		);
 
+		ExecutorService executorService = Executors.newFixedThreadPool(100);
 		try {
 			//get results of tasks and add user's user rewards list
 			List<Future<UserReward>> rewardFutures = executorService.invokeAll(tasks);
