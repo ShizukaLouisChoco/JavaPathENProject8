@@ -87,6 +87,8 @@ public class TestPerformance {
 
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
 		List<User> allUsers = tourGuideService.getAllUsers();
+
+
 		List<Callable<Object>> tasks = new ArrayList<>();
 
 		allUsers.forEach(user -> user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date())) );
