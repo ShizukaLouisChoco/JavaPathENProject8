@@ -2,23 +2,31 @@ package tourGuide;
 
 import com.jsoniter.output.JsonStream;
 import gpsUtil.location.VisitedLocation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+import tourGuide.dto.UserPreferencesDto;
+import tourGuide.exception.UserPreferecesNotFoundException;
 import tourGuide.service.TourGuideService;
+import tourGuide.service.UserService;
 import tourGuide.user.User;
 import tripPricer.Provider;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 @RestController
 public class TourGuideController {
 
-	@Autowired
-	TourGuideService tourGuideService;
-	
+	private final TourGuideService tourGuideService;
+
+    private final UserService userService;
+
+    public TourGuideController(TourGuideService tourGuideService, UserService userService) {
+        this.tourGuideService = tourGuideService;
+        this.userService = userService;
+    }
+
     @RequestMapping("/")
     public String index() {
         return "Greetings from TourGuide!";
@@ -64,7 +72,14 @@ public class TourGuideController {
     	
     	return JsonStream.serialize("");
     }
-    
+
+    @PutMapping(value = "/userPreferences")
+    public UserPreferencesDto updateUserPreferences(@RequestBody UserPreferencesDto userPreferenceDto) throws UserPreferecesNotFoundException {
+        log.debug("Request details: PUTMapping, body person : {}", userPreferenceDto);
+        return userService.updateUserPreferences(userPreferenceDto);
+    }
+
+
     @RequestMapping("/getTripDeals")
     public String getTripDeals(@RequestParam String userName) {
     	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
