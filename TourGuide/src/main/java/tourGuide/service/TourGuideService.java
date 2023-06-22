@@ -116,6 +116,16 @@ public class TourGuideService {
 		return attractionsDtoList;
 	}
 
+	public Map<String, Location> getAllUserLocations() {
+		List<User> users = getAllUsers();
+		Map<String, Location> allUserLocations = new HashMap<>();
+		for(User user : users){
+			Location location = getUserLocation(user).location;
+			allUserLocations.put(user.getUserId().toString(),location);
+		}
+
+		return allUserLocations;
+	}
 
 	public void stopTracking() throws Exception {
 		tracker.stopTracking();
