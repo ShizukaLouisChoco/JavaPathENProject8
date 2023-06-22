@@ -7,6 +7,7 @@ import gpsUtil.location.VisitedLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tourGuide.dto.AttractionsDto;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
@@ -89,13 +90,30 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
-	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
+	public List<AttractionsDto> getNearByAttractions(String userName) {
+		VisitedLocation visitedLocation = getUserLocation(getUser(userName));
 		List<Attraction> nearbyAttractions = gpsUtil.getAttractions();
-		List<Attraction> sortedAttractions = nearbyAttractions.stream()
+		List<Attraction> fiveAttractions = nearbyAttractions.stream()
 				.sorted(Comparator.comparingDouble(a -> rewardsService.getDistance(a, visitedLocation.location)))
 				.limit(5)
 				.collect(Collectors.toList());
-		return sortedAttractions;
+
+		List<AttractionsDto> attractionsDtoList = new ArrayList<>();
+		for(Attraction attraction : fiveAttractions){
+			attractionsDtoList.add(new AttractionsDto(
+					// Name of Tourist attraction,
+					attraction.attractionName,
+					// Tourist attractions lat/long,
+					new Location(attraction.latitude, attraction.longitude),
+					// The user's location lat/long,
+					getUserLocation(getUser(userName)).location,
+					// The distance in miles between the user's location and each of the attractions.
+					rewardsService.getDistance(new Location(attraction.latitude, attraction.longitude),getUserLocation(getUser(userName)).location),
+					// The reward points for visiting each Attraction.
+					rewardsService.getRewardPoints(attraction,getUser(userName))));
+		}
+
+		return attractionsDtoList;
 	}
 
 
@@ -107,15 +125,15 @@ public class TourGuideService {
 		}
 		logger.debug("Tasks Completed");
 	}
-	
+
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> tracker.stopTracking()));
 	}
 
 	/**********************************************************************************
-	 * 
+	 *
 	 * Methods Below: For Internal Testing
-	 * 
+	 *
 	 **********************************************************************************/
 	private static final String tripPricerApiKey = "test-server-api-key";
 	// Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
@@ -133,28 +151,28 @@ public class TourGuideService {
 		});
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}
-	
+
 	private void generateUserLocationHistory(User user) {
 		IntStream.range(0, 3).forEach(i-> {
 			user.addToVisitedLocations(new VisitedLocation(user.getUserId(), new Location(generateRandomLatitude(), generateRandomLongitude()), getRandomTime()));
 		});
 	}
-	
+
 	private double generateRandomLongitude() {
 		double leftLimit = -180;
 	    double rightLimit = 180;
 	    return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
 	}
-	
+
 	private double generateRandomLatitude() {
 		double leftLimit = -85.05112878;
 	    double rightLimit = 85.05112878;
 	    return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
 	}
-	
+
 	private Date getRandomTime() {
 		LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
 	    return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
-	
+
 }

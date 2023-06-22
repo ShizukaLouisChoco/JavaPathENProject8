@@ -1,10 +1,10 @@
 package tourGuide;
 
 import gpsUtil.GpsUtil;
-import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import org.junit.Test;
 import rewardCentral.RewardCentral;
+import tourGuide.dto.AttractionsDto;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
@@ -109,7 +109,7 @@ public class TestTourGuideService {
 		User user = tourGuideService.getUser("internalUser0");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 		//WHEN
-		List<Attraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
+		List<AttractionsDto> attractions = tourGuideService.getNearByAttractions(user.getUserName());
 		
 		tourGuideService.tracker.stopTracking();
 		//THEN
