@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.dto.AttractionsDto;
+import tourGuide.exception.UserInfoNotFoundException;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
@@ -58,8 +59,13 @@ public class TourGuideService {
 			trackUserLocation(user);
 	}
 	
-	public User getUser(String userName) {
-		return internalUserMap.get(userName);
+	public User getUser(String userName) throws UserInfoNotFoundException {
+		User user = internalUserMap.get(userName);
+		if (user != null) {
+			return user;}
+		else{
+			throw new UserInfoNotFoundException("User not found with userName : "+userName);
+		}
 	}
 	
 	public List<User> getAllUsers() {
