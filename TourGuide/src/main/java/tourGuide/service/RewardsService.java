@@ -34,10 +34,6 @@ public class RewardsService {
 		this.proximityBuffer = proximityBuffer;
 	}
 
-	public void setDefaultProximityBuffer() {
-		proximityBuffer = defaultProximityBuffer;
-	}
-
 	public void calculateRewards(User user) {
 		//create copy of user's visitedLocation list
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
