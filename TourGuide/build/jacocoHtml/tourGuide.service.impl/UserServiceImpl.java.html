@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TourGuide</a> &gt; <a href="index.source.html" class="el_package">tourGuide.service.impl</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package tourGuide.service.impl;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import tourGuide.dto.UserPreferencesDto;
+import tourGuide.service.TourGuideService;
+import tourGuide.service.UserService;
+import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
+
+<span class="fc" id="L11">@Slf4j</span>
+@Service
+public class UserServiceImpl implements UserService {
+
+    private final TourGuideService tourGuideService;
+
+
+<span class="fc" id="L18">    public UserServiceImpl(TourGuideService tourGuideService) {</span>
+<span class="fc" id="L19">        this.tourGuideService = tourGuideService;</span>
+<span class="fc" id="L20">    }</span>
+
+    @Override
+    public UserPreferencesDto updateUserPreferences(UserPreferencesDto userPreferenceDto)throws NumberFormatException{
+<span class="fc" id="L24">        User user = tourGuideService.getUser(userPreferenceDto.getUserName());</span>
+<span class="fc" id="L25">        UserPreferences userPreferences = user.getUserPreferences();</span>
+        try{
+<span class="fc" id="L27">            userPreferences.setTripDuration(Integer.parseInt(userPreferenceDto.getTripDuration()));</span>
+<span class="fc" id="L28">            userPreferences.setTicketQuantity(Integer.parseInt(userPreferenceDto.getTicketQuantity()));</span>
+<span class="fc" id="L29">            userPreferences.setNumberOfAdults(Integer.parseInt(userPreferenceDto.getNumberOfAdults()));</span>
+<span class="fc" id="L30">            userPreferences.setNumberOfChildren(Integer.parseInt(userPreferenceDto.getNumberOfChildren()));</span>
+<span class="nc" id="L31">        }catch(NumberFormatException e){</span>
+<span class="nc" id="L32">            log.debug(&quot;NumberFormatException : &quot; + e);</span>
+<span class="fc" id="L33">        }</span>
+
+<span class="fc" id="L35">        user.setUserPreferences(userPreferences);</span>
+<span class="fc" id="L36">        return userPreferenceDto;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
