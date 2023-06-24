@@ -50,6 +50,7 @@ public class TourGuideService {
 	}
 	
 	public List<UserReward> getUserRewards(User user) {
+		rewardsService.calculateRewards(user);
 		return user.getUserRewards();
 	}
 	
