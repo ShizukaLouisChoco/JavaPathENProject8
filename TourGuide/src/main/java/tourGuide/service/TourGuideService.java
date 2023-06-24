@@ -82,6 +82,7 @@ public class TourGuideService {
 	
 
 	public VisitedLocation trackUserLocation(User user) {
+		//creation visitedLocation from last or actual userLocation
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		executorService.submit(() -> {
 			user.addToVisitedLocations(visitedLocation);

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 
-public class TestPerformance {
+public class PerformanceTest {
 	
 	/*
 	 * A note on performance improvements:

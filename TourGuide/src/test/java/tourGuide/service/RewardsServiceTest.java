@@ -1,4 +1,4 @@
-package tourGuide;
+package tourGuide.service;
 
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
@@ -6,8 +6,6 @@ import gpsUtil.location.VisitedLocation;
 import org.junit.Test;
 import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
-import tourGuide.service.RewardsService;
-import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
@@ -18,7 +16,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestRewardsService {
+public class RewardsServiceTest {
 
 	@Test
 	public void userGetRewards() throws Exception{
@@ -29,8 +27,11 @@ public class TestRewardsService {
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		//pickup one attraction for this test
 		Attraction attraction = gpsUtil.getAttractions().get(0);
+		//add visitedLocation with attraction location
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
+		//verify user location
 		tourGuideService.trackUserLocation(user);
 		List<UserReward> userRewards = user.getUserRewards();
 		tourGuideService.stopTracking();

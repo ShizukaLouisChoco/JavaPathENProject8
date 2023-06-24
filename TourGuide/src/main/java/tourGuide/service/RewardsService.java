@@ -44,10 +44,9 @@ public class RewardsService {
 		//create attraction list from gpsUtil
 		List<Attraction> attractions = gpsUtil.getAttractions();
 
-		//create task list
+		//create empty task list
 		List<Callable<UserReward>> tasks  = new ArrayList<>();
-		//verify attraction of user's visitedLocation list
-
+		//verify attraction of user's visitedLocation list & creating task and add in task list
 		userLocations.forEach(visitedLocation -> attractions
 				.stream()
 				//filter attractions which is not in user's userRewards list
@@ -60,7 +59,7 @@ public class RewardsService {
 
 		ExecutorService executorService = Executors.newFixedThreadPool(100);
 		try {
-			//get results of tasks and add user's user rewards list
+			//wait completion of the tasks and get results of tasks and add user's user rewards list
 			List<Future<UserReward>> rewardFutures = executorService.invokeAll(tasks);
 			for (Future<UserReward> future : rewardFutures) {
 				//add userReward list
