@@ -1,7 +1,6 @@
 package tourGuide;
 
 import com.jsoniter.output.JsonStream;
-import gpsUtil.location.VisitedLocation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import tourGuide.dto.UserPreferencesDto;
@@ -34,8 +33,7 @@ public class TourGuideController {
     
     @RequestMapping("/getLocation") 
     public String getLocation(@RequestParam String userName) throws ExecutionException, InterruptedException {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-		return JsonStream.serialize(visitedLocation.location);
+		return JsonStream.serialize(tourGuideService.getUserLocation(getUser(userName)).location);
     }
 
     //  Instead: Get the closest five tourist attractions to the user - no matter how far away they are.
