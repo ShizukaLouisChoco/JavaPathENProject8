@@ -6,6 +6,7 @@ import gpsUtil.location.VisitedLocation;
 import org.junit.Test;
 import rewardCentral.RewardCentral;
 import tourGuide.dto.AttractionsDto;
+import tourGuide.exception.UserInfoException;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.user.User;
 import tripPricer.Provider;
@@ -58,7 +59,25 @@ public class TourGuideServiceTest {
 		assertEquals(user, retrievedUser);
 		assertEquals(user2, retrievedUser2);
 	}
-	
+
+	@Test(expected = UserInfoException.class)
+	public void addUserWithException() {
+		//GIVEN
+		GpsUtil gpsUtil = new GpsUtil();
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		InternalTestHelper.setInternalUserNumber(0);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		User user2 = new User(UUID.randomUUID(), "jon", "000", "jon2@tourGuide.com");
+		tourGuideService.addUser(user);
+		//WHEN
+		tourGuideService.addUser(user2);
+
+		tourGuideService.tracker.stopTracking();
+		//THEN
+	}
+
 	@Test
 	public void getAllUsers() {
 		//GIVEN

@@ -4,7 +4,7 @@ import com.jsoniter.output.JsonStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import tourGuide.dto.UserPreferencesDto;
-import tourGuide.exception.UserInfoNotFoundException;
+import tourGuide.exception.UserInfoException;
 import tourGuide.service.TourGuideService;
 import tourGuide.service.UserService;
 import tourGuide.user.User;
@@ -68,7 +68,7 @@ public class TourGuideController {
     }
 
     @PutMapping(value = "/userPreferences")
-    public UserPreferencesDto updateUserPreferences(@RequestBody UserPreferencesDto userPreferenceDto) throws UserInfoNotFoundException {
+    public UserPreferencesDto updateUserPreferences(@RequestBody UserPreferencesDto userPreferenceDto) throws UserInfoException {
         log.debug("Request details: PUTMapping, body person : {}", userPreferenceDto);
         return userService.updateUserPreferences(userPreferenceDto);
     }
