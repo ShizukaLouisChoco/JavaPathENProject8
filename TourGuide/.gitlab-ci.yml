@@ -1,0 +1,28 @@
+# .gitlab-ci.yml
+
+# Here we define how to do pipeline job
+
+# pipeline environment
+image: gradle:jdk11
+
+# job definition
+# build
+build:
+  stage: build
+  script:
+    - gradle build
+
+# test
+test:
+  stage: test
+  script:
+    - gradle test
+
+# jar construction
+jar:
+  stage: deploy
+  script:
+    - gradle jar
+  artifacts:
+    paths:
+      - build/libs/*.jar
