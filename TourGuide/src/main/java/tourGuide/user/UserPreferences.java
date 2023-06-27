@@ -1,9 +1,9 @@
 package tourGuide.user;
 
+import org.javamoney.moneta.Money;
+
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
-
-import org.javamoney.moneta.Money;
 
 
 public class UserPreferences {
@@ -18,6 +18,12 @@ public class UserPreferences {
 	private int numberOfChildren = 0;
 	
 	public UserPreferences() {
+	}
+	public UserPreferences(int tripDuration, int ticketQuantity, int numberOfAdults, int numberOfChildren) {
+		this.tripDuration = tripDuration;
+		this.ticketQuantity = ticketQuantity;
+		this.numberOfAdults = numberOfAdults;
+		this.numberOfChildren = numberOfChildren;
 	}
 	
 	public void setAttractionProximity(int attractionProximity) {

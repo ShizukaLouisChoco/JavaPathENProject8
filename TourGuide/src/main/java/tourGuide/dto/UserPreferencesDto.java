@@ -16,11 +16,11 @@ public class UserPreferencesDto implements Serializable {
     @NotNull
     private Integer tripDuration;
     @NotNull
-    private String ticketQuantity;
+    private Integer ticketQuantity;
     @NotNull
-    private String numberOfAdults;
+    private Integer numberOfAdults;
     @NotNull
-    private String numberOfChildren;
+    private Integer numberOfChildren;
 
 
 
