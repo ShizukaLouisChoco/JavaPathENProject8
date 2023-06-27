@@ -14,7 +14,7 @@ public class UserPreferencesDto implements Serializable {
     @NotNull
     private String userName;
     @NotNull
-    private String tripDuration;
+    private Integer tripDuration;
     @NotNull
     private String ticketQuantity;
     @NotNull

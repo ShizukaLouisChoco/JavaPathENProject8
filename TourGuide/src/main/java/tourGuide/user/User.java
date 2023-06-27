@@ -1,6 +1,7 @@
 package tourGuide.user;
 
 import gpsUtil.location.VisitedLocation;
+import lombok.ToString;
 import tripPricer.Provider;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@ToString
 public class User {
 	private final UUID userId;
 	private final String userName;

@@ -23,14 +23,12 @@ public class UserServiceImpl implements UserService {
     public UserPreferencesDto updateUserPreferences(UserPreferencesDto userPreferenceDto)throws NumberFormatException{
         User user = tourGuideService.getUser(userPreferenceDto.getUserName());
         UserPreferences userPreferences = user.getUserPreferences();
-        try{
-            userPreferences.setTripDuration(Integer.parseInt(userPreferenceDto.getTripDuration()));
-            userPreferences.setTicketQuantity(Integer.parseInt(userPreferenceDto.getTicketQuantity()));
-            userPreferences.setNumberOfAdults(Integer.parseInt(userPreferenceDto.getNumberOfAdults()));
-            userPreferences.setNumberOfChildren(Integer.parseInt(userPreferenceDto.getNumberOfChildren()));
-        }catch(NumberFormatException e){
-            log.debug("NumberFormatException : " + e);
-        }
+
+            userPreferences.setTripDuration(userPreferenceDto.getTripDuration());
+            userPreferences.setTicketQuantity(userPreferenceDto.getTicketQuantity());
+            userPreferences.setNumberOfAdults(userPreferenceDto.getNumberOfAdults());
+            userPreferences.setNumberOfChildren(userPreferenceDto.getNumberOfChildren());
+
 
         user.setUserPreferences(userPreferences);
         return userPreferenceDto;

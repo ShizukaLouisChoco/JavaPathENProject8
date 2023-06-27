@@ -10,7 +10,7 @@ import tourGuide.user.User;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class UserServiceTest {
 
@@ -25,19 +25,19 @@ public class UserServiceTest {
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
         tourGuideService.addUser(user);
-        assertTrue(user.getUserPreferences().getTripDuration() == 1);
-        assertTrue(user.getUserPreferences().getTicketQuantity() == 1);
-        assertTrue(user.getUserPreferences().getNumberOfAdults() == 1);
-        assertTrue(user.getUserPreferences().getNumberOfChildren() == 0);
+        assertEquals(1, user.getUserPreferences().getTripDuration());
+        assertEquals(1, user.getUserPreferences().getTicketQuantity());
+        assertEquals(1, user.getUserPreferences().getNumberOfAdults());
+        assertEquals(0, user.getUserPreferences().getNumberOfChildren());
 
         //WHEN
-        userService.updateUserPreferences(new UserPreferencesDto("jon","2","2","2","2"));
+        userService.updateUserPreferences(new UserPreferencesDto("jon",2,2,2,2));
         tourGuideService.tracker.stopTracking();
         //THEN
-        assertTrue(user.getUserPreferences().getTripDuration() == 2);
-        assertTrue(user.getUserPreferences().getTicketQuantity() == 2);
-        assertTrue(user.getUserPreferences().getNumberOfAdults() == 2);
-        assertTrue(user.getUserPreferences().getNumberOfChildren() == 2);
+        assertEquals(2, user.getUserPreferences().getTripDuration());
+        assertEquals(2, user.getUserPreferences().getTicketQuantity());
+        assertEquals(2, user.getUserPreferences().getNumberOfAdults());
+        assertEquals(2, user.getUserPreferences().getNumberOfChildren());
 
     }
 
