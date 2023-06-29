@@ -39,11 +39,28 @@ public class RewardsServiceTest {
 	}
 	
 	@Test
-	public void isWithinAttractionProximity() {
+	public void getRewardPoints() throws Exception {
+		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+
+		InternalTestHelper.setInternalUserNumber(0);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		//pickup one attraction for this test
 		Attraction attraction = gpsUtil.getAttractions().get(0);
-		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
+		//add visitedLocation with attraction location
+		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
+		//verify user location and give userRewards
+		tourGuideService.trackUserLocation(user);
+		//WHEN
+		tourGuideService.stopTracking();
+		rewardsService.calculateRewards(user);
+		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
+
+		//THEN
+		assertTrue(cumulatativeRewardPoints > 0);
 	}
 	
 	@Test
