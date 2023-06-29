@@ -20,6 +20,7 @@ public class RewardsServiceTest {
 
 	@Test
 	public void userGetRewards() throws Exception{
+		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
@@ -31,10 +32,13 @@ public class RewardsServiceTest {
 		Attraction attraction = gpsUtil.getAttractions().get(0);
 		//add visitedLocation with attraction location
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
-		//verify user location
+		//verify user location and give userRewards
 		tourGuideService.trackUserLocation(user);
+		//WHEN
 		List<UserReward> userRewards = user.getUserRewards();
 		tourGuideService.stopTracking();
+
+		//THEN
 		assertEquals(1, userRewards.size());
 	}
 	
@@ -72,7 +76,7 @@ public class RewardsServiceTest {
 
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
-		
+
 		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
 		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0));
 		tourGuideService.stopTracking();
