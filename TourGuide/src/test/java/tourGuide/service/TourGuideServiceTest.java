@@ -78,6 +78,21 @@ public class TourGuideServiceTest {
 		//THEN
 	}
 
+	@Test(expected = UserInfoException.class)
+	public void getUserWithException() {
+		//GIVEN
+		GpsUtil gpsUtil = new GpsUtil();
+		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		InternalTestHelper.setInternalUserNumber(1);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+
+		//WHEN
+		tourGuideService.getUser("testUser");
+
+		tourGuideService.tracker.stopTracking();
+		//THEN
+	}
+
 	@Test
 	public void getAllUsers() {
 		//GIVEN
@@ -165,7 +180,7 @@ public class TourGuideServiceTest {
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
-		
+
 		User user = tourGuideService.getUser("internalUser0");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 		//WHEN
@@ -192,6 +207,6 @@ public class TourGuideServiceTest {
 		//THEN
 		assertEquals(5, providers.size());
 	}
-	
-	
+
+
 }
