@@ -72,11 +72,6 @@ public class RewardsService {
 
 	}
 
-	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
-		//verify if the distance of attraction and the location is not bigger than 200
-		return !(getDistance(attraction, location) > attractionProximityRange);
-	}
-
 	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
 		//verify if the distance of attraction and the location is not bigger than 10
 		return !(getDistance(attraction, visitedLocation.location) > proximityBuffer);

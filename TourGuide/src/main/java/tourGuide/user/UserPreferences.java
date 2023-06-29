@@ -19,36 +19,6 @@ public class UserPreferences {
 	
 	public UserPreferences() {
 	}
-	public UserPreferences(int tripDuration, int ticketQuantity, int numberOfAdults, int numberOfChildren) {
-		this.tripDuration = tripDuration;
-		this.ticketQuantity = ticketQuantity;
-		this.numberOfAdults = numberOfAdults;
-		this.numberOfChildren = numberOfChildren;
-	}
-	
-	public void setAttractionProximity(int attractionProximity) {
-		this.attractionProximity = attractionProximity;
-	}
-	
-	public int getAttractionProximity() {
-		return attractionProximity;
-	}
-	
-	public Money getLowerPricePoint() {
-		return lowerPricePoint;
-	}
-
-	public void setLowerPricePoint(Money lowerPricePoint) {
-		this.lowerPricePoint = lowerPricePoint;
-	}
-
-	public Money getHighPricePoint() {
-		return highPricePoint;
-	}
-
-	public void setHighPricePoint(Money highPricePoint) {
-		this.highPricePoint = highPricePoint;
-	}
 	
 	public int getTripDuration() {
 		return tripDuration;
