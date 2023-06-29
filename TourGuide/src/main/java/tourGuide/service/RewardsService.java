@@ -4,6 +4,7 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import rewardCentral.RewardCentral;
 import tourGuide.user.User;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+@Slf4j
 @Service
 public class RewardsService {
 	private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
@@ -62,6 +64,7 @@ public class RewardsService {
 				user.addUserReward(future.get()); // this setter filters out duplicated rewards
 			}
 		} catch (InterruptedException | ExecutionException e) {
+			log.debug("runtimeException");
 			throw new RuntimeException(e);
 		} finally {
 			executorService.shutdown();
