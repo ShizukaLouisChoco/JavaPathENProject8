@@ -33,11 +33,11 @@ public class TourGuideService {
 	public final Tracker tracker;
 	boolean testMode = true;
 	public final ExecutorService executorService = Executors.newFixedThreadPool(100);
-	
+
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
-		
+
 		if(testMode) {
 			log.info("TestMode enabled");
 			log.debug("Initializing users");
@@ -47,18 +47,18 @@ public class TourGuideService {
 		tracker = new Tracker(this);
 		addShutDownHook();
 	}
-	
+
 	public List<UserReward> getUserRewards(User user) {
 		rewardsService.calculateRewards(user);
 		return user.getUserRewards();
 	}
-	
+
 	public VisitedLocation getUserLocation(User user) {
 		return (user.getVisitedLocations().size() > 0) ?
 			user.getLastVisitedLocation() :
 			trackUserLocation(user);
 	}
-	
+
 	public User getUser(String userName) throws UserInfoException {
 		User user = internalUserMap.get(userName);
 		if (user != null) {
@@ -67,11 +67,11 @@ public class TourGuideService {
 			throw new UserInfoException("User not found with userName : "+userName);
 		}
 	}
-	
+
 	public List<User> getAllUsers() {
 		return new ArrayList<>(internalUserMap.values());
 	}
-	
+
 	public void addUser(User user) {
 		if(!internalUserMap.containsKey(user.getUserName())) {
 			internalUserMap.put(user.getUserName(), user);
@@ -79,7 +79,7 @@ public class TourGuideService {
 			throw new UserInfoException(user.getUserName()+" is already used");
 		}
 	}
-	
+
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
@@ -87,7 +87,7 @@ public class TourGuideService {
 		user.setTripDeals(providers);
 		return providers;
 	}
-	
+
 
 	public VisitedLocation trackUserLocation(User user) {
 		//creation visitedLocation from last or actual userLocation
@@ -113,11 +113,11 @@ public class TourGuideService {
 					// Name of Tourist attraction,
 					attraction.attractionName,
 					// Tourist attractions lat/long,
-					new Location(attraction.latitude, attraction.longitude),
+					attraction,
 					// The user's location lat/long,
 					getUserLocation(getUser(userName)).location,
 					// The distance in miles between the user's location and each of the attractions.
-					rewardsService.getDistance(new Location(attraction.latitude, attraction.longitude),getUserLocation(getUser(userName)).location),
+					rewardsService.getDistance(attraction,getUserLocation(getUser(userName)).location),
 					// The reward points for visiting each Attraction.
 					rewardsService.getRewardPoints(attraction,getUser(userName))));
 		}
