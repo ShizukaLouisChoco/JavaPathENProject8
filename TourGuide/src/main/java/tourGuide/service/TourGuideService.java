@@ -4,8 +4,7 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tourGuide.dto.AttractionsDto;
 import tourGuide.exception.UserInfoException;
@@ -25,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 public class TourGuideService {
-	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsUtil gpsUtil;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
@@ -40,10 +39,10 @@ public class TourGuideService {
 		this.rewardsService = rewardsService;
 		
 		if(testMode) {
-			logger.info("TestMode enabled");
-			logger.debug("Initializing users");
+			log.info("TestMode enabled");
+			log.debug("Initializing users");
 			initializeInternalUsers();
-			logger.debug("Finished initializing users");
+			log.debug("Finished initializing users");
 		}
 		tracker = new Tracker(this);
 		addShutDownHook();
@@ -139,11 +138,11 @@ public class TourGuideService {
 
 	public void stopTracking() throws Exception {
 		tracker.stopTracking();
-		logger.debug("Tracker stopped. Completing tasks");
+		log.debug("Tracker stopped. Completing tasks");
 		executorService.shutdown();
 		while(!executorService.awaitTermination(1, TimeUnit.MINUTES)){
 		}
-		logger.debug("Tasks Completed");
+		log.debug("Tasks Completed");
 	}
 
 	private void addShutDownHook() {
@@ -159,7 +158,7 @@ public class TourGuideService {
 	// Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
 	private final Map<String, User> internalUserMap = new HashMap<>();
 	private void initializeInternalUsers() {
-		logger.debug("Creating " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
+		log.debug("Creating " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 		IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
 			String userName = "internalUser" + i;
 			String phone = "000";
@@ -169,7 +168,7 @@ public class TourGuideService {
 
 			internalUserMap.put(userName, user);
 		});
-		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
+		log.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}
 
 	private void generateUserLocationHistory(User user) {
