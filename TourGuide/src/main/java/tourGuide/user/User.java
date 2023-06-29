@@ -1,7 +1,6 @@
 package tourGuide.user;
 
 import gpsUtil.location.VisitedLocation;
-import lombok.ToString;
 import tripPricer.Provider;
 
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@ToString
 public class User {
 	private final UUID userId;
 	private final String userName;
@@ -34,31 +32,7 @@ public class User {
 	public String getUserName() {
 		return userName;
 	}
-	
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-	
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
 
-	public void setEmailAddress(String emailAddress) {
-		this.emailAddress = emailAddress;
-	}
-	
-	public String getEmailAddress() {
-		return emailAddress;
-	}
-	
-	public void setLatestLocationTimestamp(Date latestLocationTimestamp) {
-		this.latestLocationTimestamp = latestLocationTimestamp;
-	}
-	
-	public Date getLatestLocationTimestamp() {
-		return latestLocationTimestamp;
-	}
-	
 	public void addToVisitedLocations(VisitedLocation visitedLocation) {
 		visitedLocations.add(visitedLocation);
 	}
@@ -97,8 +71,5 @@ public class User {
 		this.tripDeals = tripDeals;
 	}
 	
-	public List<Provider> getTripDeals() {
-		return tripDeals;
-	}
 
 }

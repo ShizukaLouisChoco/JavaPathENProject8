@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserPreferencesDto updateUserPreferences(UserPreferencesDto userPreferenceDto)throws NumberFormatException{
+    public UserPreferencesDto updateUserPreferences(UserPreferencesDto userPreferenceDto){
         User user = tourGuideService.getUser(userPreferenceDto.getUserName());
         UserPreferences userPreferences = user.getUserPreferences();
 
