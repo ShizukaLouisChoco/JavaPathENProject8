@@ -29,7 +29,7 @@ stages:
 build:
   stage: build
   script:
-    - cd p08/TourGuide
+    - cd p08
     - gradle --build-cache assemble
   artifacts:
     paths:
@@ -38,7 +38,7 @@ build:
 test:
   stage: test
   script: 
-    - cd p08/TourGuide
+    - cd p08
     - gradle check
   artifacts:
     when: always
