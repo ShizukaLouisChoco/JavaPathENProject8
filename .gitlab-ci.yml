@@ -28,18 +28,22 @@ stages:
 
 build:
   stage: build
-  script: gradle assemble
+  script:
+    - cd p08/TourGuide
+    - gradle --build-cache assemble
   artifacts:
     paths:
-      - ./build/libs/*.jar
+      - p08/TourGuide/build/libs/*.jar
 
 test:
   stage: test
-  script: gradle check
+  script: 
+    - cd p08/TourGuide
+    - gradle check
   artifacts:
     when: always
     reports:
       junit: ./build/test-results/test/**/TEST-*.xml
     paths:
-      - ./build/reports
-      - ./build/jacoco/*.exec
+      - p08/TourGuide/build/reports
+      - p08/TourGuide/build/jacoco/*.exec
