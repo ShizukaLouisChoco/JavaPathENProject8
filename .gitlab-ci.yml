@@ -29,7 +29,7 @@ stages:
 build:
   stage: build
   script:
-    - cd p08
+    - cd TourGuide
     - gradle --build-cache assemble
   artifacts:
     paths:
