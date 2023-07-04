@@ -6,6 +6,8 @@ import gpsUtil.location.VisitedLocation;
 import org.junit.Test;
 import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.service.impl.RewardsServiceImpl;
+import tourGuide.service.impl.TourGuideServiceImpl;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
@@ -22,10 +24,10 @@ public class RewardsServiceTest {
 	public void userGetRewards() throws Exception{
 		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		RewardsServiceImpl rewardsServiceImpl = new RewardsServiceImpl(gpsUtil, new RewardCentral());
 
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+		TourGuideServiceImpl tourGuideServiceImpl = new TourGuideServiceImpl(gpsUtil, rewardsServiceImpl);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		//pickup one attraction for this test
@@ -33,10 +35,10 @@ public class RewardsServiceTest {
 		//add visitedLocation with attraction location
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
 		//verify user location and give userRewards
-		tourGuideService.trackUserLocation(user);
+		tourGuideServiceImpl.trackUserLocation(user);
 		//WHEN
 		List<UserReward> userRewards = user.getUserRewards();
-		tourGuideService.stopTracking();
+		tourGuideServiceImpl.stopTracking();
 
 		//THEN
 		assertEquals(1, userRewards.size());
@@ -46,10 +48,10 @@ public class RewardsServiceTest {
 	public void getRewardPoints() throws Exception {
 		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		RewardsServiceImpl rewardsServiceImpl = new RewardsServiceImpl(gpsUtil, new RewardCentral());
 
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+		TourGuideServiceImpl tourGuideServiceImpl = new TourGuideServiceImpl(gpsUtil, rewardsServiceImpl);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		//pickup one attraction for this test
@@ -57,10 +59,10 @@ public class RewardsServiceTest {
 		//add visitedLocation with attraction location
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
 		//verify user location and give userRewards
-		tourGuideService.trackUserLocation(user);
+		tourGuideServiceImpl.trackUserLocation(user);
 		//WHEN
-		tourGuideService.stopTracking();
-		rewardsService.calculateRewards(user);
+		tourGuideServiceImpl.stopTracking();
+		rewardsServiceImpl.calculateRewards(user);
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(UserReward::getRewardPoints).sum();
 
 		//THEN
@@ -71,15 +73,15 @@ public class RewardsServiceTest {
 	public void nearAllAttractions() throws Exception {
 		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
+		RewardsServiceImpl rewardsServiceImpl = new RewardsServiceImpl(gpsUtil, new RewardCentral());
+		rewardsServiceImpl.setProximityBuffer(Integer.MAX_VALUE);
 
 		InternalTestHelper.setInternalUserNumber(1);
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+		TourGuideServiceImpl tourGuideServiceImpl = new TourGuideServiceImpl(gpsUtil, rewardsServiceImpl);
 
-		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
-		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0));
-		tourGuideService.stopTracking();
+		rewardsServiceImpl.calculateRewards(tourGuideServiceImpl.getAllUsers().get(0));
+		List<UserReward> userRewards = tourGuideServiceImpl.getUserRewards(tourGuideServiceImpl.getAllUsers().get(0));
+		tourGuideServiceImpl.stopTracking();
 
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());
 	}

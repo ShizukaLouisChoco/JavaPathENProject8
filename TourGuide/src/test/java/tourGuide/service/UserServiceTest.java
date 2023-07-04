@@ -5,6 +5,8 @@ import org.junit.Test;
 import rewardCentral.RewardCentral;
 import tourGuide.dto.UserPreferencesDto;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.service.impl.RewardsServiceImpl;
+import tourGuide.service.impl.TourGuideServiceImpl;
 import tourGuide.service.impl.UserServiceImpl;
 import tourGuide.user.User;
 
@@ -19,12 +21,12 @@ public class UserServiceTest {
         //GIVEN
         InternalTestHelper.setInternalUserNumber(1);
         GpsUtil gpsUtil = new GpsUtil();
-        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-        TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
-        UserService userService = new UserServiceImpl(tourGuideService);
+        RewardsServiceImpl rewardsServiceImpl = new RewardsServiceImpl(gpsUtil, new RewardCentral());
+        TourGuideServiceImpl tourGuideServiceImpl = new TourGuideServiceImpl(gpsUtil, rewardsServiceImpl);
+        UserService userService = new UserServiceImpl(tourGuideServiceImpl);
 
         User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-        tourGuideService.addUser(user);
+        tourGuideServiceImpl.addUser(user);
         assertEquals(1, user.getUserPreferences().getTripDuration());
         assertEquals(1, user.getUserPreferences().getTicketQuantity());
         assertEquals(1, user.getUserPreferences().getNumberOfAdults());
@@ -32,7 +34,7 @@ public class UserServiceTest {
 
         //WHEN
         userService.updateUserPreferences(new UserPreferencesDto("jon",2,2,2,2));
-        tourGuideService.tracker.stopTracking();
+        tourGuideServiceImpl.tracker.stopTracking();
         //THEN
         assertEquals(2, user.getUserPreferences().getTripDuration());
         assertEquals(2, user.getUserPreferences().getTicketQuantity());
