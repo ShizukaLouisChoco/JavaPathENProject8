@@ -10,7 +10,6 @@
 # https://gradle.org/
 # https://github.com/gradle/gradle
 
-
 image: gradle:7-jdk11-alpine
 
 before_script:
@@ -25,6 +24,8 @@ cache:
 stages:
   - build
   - test
+#  - deploy
+
 
 
 build:
@@ -32,19 +33,46 @@ build:
   script:
     - cd TourGuide
     - gradle --build-cache assemble
-  artifacts:
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
     paths:
-      - build/libs/*.jar
+      - build
+      - .gradle
+  artifacts:
+    when: on_success
+    paths:
+      - ./build/libs
+    expire_in: 30 days
 
 test:
   stage: test
   script:
     - cd TourGuide
     - gradle check
-  artifacts:
-    when: always
-    reports:
-      junit: build/test-results/test/**/TEST-*.xml
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
     paths:
-      - build/reports
-      - build/jacoco/*.exec
+      - build
+      - .gradle
+  artifacts:
+    when: on_success
+    paths:
+      - TourGuide/build/jacocoHtml
+    expire_in: 30 days
+
+#deploy:
+#  stage: deploy
+#  script:
+#    - cd TourGuide
+#    - gradle bootJar
+#  cache:
+#    key: "$CI_COMMIT_REF_NAME"
+#    policy: push
+#    paths:
+#      - build
+#      - .gradle
+#  artifacts:
+#    paths:
+#      - TourGuide/build/libs/*.jar
