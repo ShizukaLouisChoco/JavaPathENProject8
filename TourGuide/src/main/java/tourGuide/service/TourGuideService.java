@@ -3,6 +3,7 @@ package tourGuide.service;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.dto.AttractionsDto;
+import tourGuide.dto.UserPreferencesDto;
 import tourGuide.exception.UserInfoException;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
@@ -22,6 +23,8 @@ public interface TourGuideService {
     List<User> getAllUsers();
 
     void addUser(User user);
+
+    UserPreferencesDto updateUserPreferences(UserPreferencesDto userPreferenceDto);
 
     List<Provider> getTripDeals(User user);
 

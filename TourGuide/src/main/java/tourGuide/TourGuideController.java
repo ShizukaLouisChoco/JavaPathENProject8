@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import tourGuide.dto.UserPreferencesDto;
 import tourGuide.exception.UserInfoException;
 import tourGuide.service.TourGuideService;
-import tourGuide.service.UserService;
 import tourGuide.user.User;
 import tripPricer.Provider;
 
@@ -19,11 +18,9 @@ public class TourGuideController {
 
 	private final TourGuideService tourGuideService;
 
-    private final UserService userService;
 
-    public TourGuideController(TourGuideService tourGuideService, UserService userService) {
+    public TourGuideController(TourGuideService tourGuideService) {
         this.tourGuideService = tourGuideService;
-        this.userService = userService;
     }
 
     @RequestMapping("/")
@@ -70,7 +67,7 @@ public class TourGuideController {
     @PutMapping(value = "/userPreferences")
     public UserPreferencesDto updateUserPreferences(@RequestBody UserPreferencesDto userPreferenceDto) throws UserInfoException {
         log.debug("Request details: PUTMapping, body person : {}", userPreferenceDto);
-        return userService.updateUserPreferences(userPreferenceDto);
+        return tourGuideService.updateUserPreferences(userPreferenceDto);
     }
 
 

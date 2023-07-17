@@ -7,12 +7,14 @@ import gpsUtil.location.VisitedLocation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tourGuide.dto.AttractionsDto;
+import tourGuide.dto.UserPreferencesDto;
 import tourGuide.exception.UserInfoException;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
@@ -80,6 +82,21 @@ public class TourGuideServiceImpl implements TourGuideService {
 		}else{
 			throw new UserInfoException(user.getUserName()+" is already used");
 		}
+	}
+
+	@Override
+	public UserPreferencesDto updateUserPreferences(UserPreferencesDto userPreferenceDto){
+		User user = getUser(userPreferenceDto.getUserName());
+		UserPreferences userPreferences = user.getUserPreferences();
+
+		userPreferences.setTripDuration(userPreferenceDto.getTripDuration());
+		userPreferences.setTicketQuantity(userPreferenceDto.getTicketQuantity());
+		userPreferences.setNumberOfAdults(userPreferenceDto.getNumberOfAdults());
+		userPreferences.setNumberOfChildren(userPreferenceDto.getNumberOfChildren());
+
+
+		user.setUserPreferences(userPreferences);
+		return userPreferenceDto;
 	}
 
 	public List<Provider> getTripDeals(User user) {
