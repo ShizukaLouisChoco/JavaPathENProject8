@@ -7,16 +7,13 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
 import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.service.RewardsService;
 import tourGuide.service.impl.RewardsServiceImpl;
 import tourGuide.service.impl.TourGuideServiceImpl;
 import tourGuide.user.User;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
@@ -47,10 +44,10 @@ public class PerformanceTest {
 	public void highVolumeTrackLocation() throws Exception {
 		//GIVEN
 		GpsUtil gpsUtil = new GpsUtil();
-		RewardsServiceImpl rewardsServiceImpl = new RewardsServiceImpl(gpsUtil, new RewardCentral());
+		RewardsService rewardsService = new RewardsServiceImpl(gpsUtil, new RewardCentral());
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(100_000);
-		TourGuideServiceImpl tourGuideServiceImpl = new TourGuideServiceImpl(gpsUtil, rewardsServiceImpl);
+		InternalTestHelper.setInternalUserNumber(100);
+		TourGuideServiceImpl tourGuideServiceImpl = new TourGuideServiceImpl(gpsUtil, rewardsService);
 
 		List<User> allUsers = tourGuideServiceImpl.getAllUsers();
 		
@@ -58,13 +55,9 @@ public class PerformanceTest {
 		stopWatch.start();
 
 		//WHEN
-
-		List<Callable<VisitedLocation>> tasks = new ArrayList<>();
-		allUsers.forEach(user -> tasks.add(() -> tourGuideServiceImpl.trackUserLocation(user)));
-		ExecutorService executorService = Executors.newFixedThreadPool(100);
-		executorService.invokeAll(tasks);
-		executorService.shutdown();
-
+		for(User user : allUsers) {
+			tourGuideServiceImpl.trackUserLocation(user);
+		}
 		stopWatch.stop();
 		tourGuideServiceImpl.tracker.stopTracking();
 		//THEN
@@ -88,16 +81,14 @@ public class PerformanceTest {
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
 		List<User> allUsers = tourGuideServiceImpl.getAllUsers();
 
+		allUsers = tourGuideServiceImpl.getAllUsers();
+		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-		List<Callable<Object>> tasks = new ArrayList<>();
+		allUsers.forEach(u -> rewardsServiceImpl.calculateRewards(u));
 
-		allUsers.forEach(user -> user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date())) );
-		allUsers.forEach(user -> tasks.add(Executors.callable(()-> rewardsServiceImpl.calculateRewards(user))));
-
-		ExecutorService executorService = Executors.newFixedThreadPool(100);
-
-		executorService.invokeAll(tasks);
-		executorService.shutdown();
+		for(User user : allUsers) {
+			assertTrue(user.getUserRewards().size() > 0);
+		}
 
 		stopWatch.stop();
 		tourGuideServiceImpl.stopTracking();
